@@ -1,0 +1,19 @@
+{
+  "name": "tipper-frontend",
+  "version": "1.0.0",
+  "description": "TIPPER Social Media Frontend",
+  "main": "index.js",
+  "scripts": {
+    "start": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "install:client": "cd client && npm install"
+  },
+  "keywords": [
+    "social-media",
+    "tipping",
+    "react",
+    "frontend"
+  ],
+  "author": "TIPPER Team",
+  "license": "MIT"
+} 
