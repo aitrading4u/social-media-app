@@ -11,7 +11,10 @@ import {
   Divider,
   InputAdornment,
   IconButton,
-  Grid
+  Grid,
+  Alert,
+  Snackbar,
+  CircularProgress
 } from '@mui/material';
 import { 
   Person, 
@@ -22,24 +25,80 @@ import {
   Google,
   Facebook
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../stores/authStore';
 
 
 const Register: React.FC = () => {
+  const navigate = useNavigate();
+  const { login } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     username: '',
-    displayName: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
+    dateOfBirth: '',
     referralCode: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Register attempt:', formData);
-    // TODO: Implement actual registration logic
+    setError('');
+    setLoading(true);
+
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: formData.username,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          dateOfBirth: formData.dateOfBirth,
+          referralCode: formData.referralCode || undefined
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Registration failed');
+      }
+
+      // Login the user automatically
+      login(data.user, data.accessToken);
+      
+      // Redirect to home page
+      navigate('/');
+      
+    } catch (err: any) {
+      setError(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,15 +161,39 @@ const Register: React.FC = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Display Name"
-                  name="displayName"
-                  value={formData.displayName}
+                  label="First Name"
+                  name="firstName"
+                  value={formData.firstName}
                   onChange={handleChange}
                   margin="normal"
                   required
                 />
               </Grid>
             </Grid>
+
+            <TextField
+              fullWidth
+              label="Last Name"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              margin="normal"
+              required
+            />
+
+            <TextField
+              fullWidth
+              label="Date of Birth"
+              name="dateOfBirth"
+              type="date"
+              value={formData.dateOfBirth}
+              onChange={handleChange}
+              margin="normal"
+              required
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
 
             <TextField
               fullWidth
@@ -196,11 +279,18 @@ const Register: React.FC = () => {
               helperText="Enter a friend's referral code to get 10 bonus tokens"
             />
 
+            {error && (
+              <Alert severity="error" sx={{ mt: 2 }}>
+                {error}
+              </Alert>
+            )}
+
             <Button
               type="submit"
               fullWidth
               variant="contained"
               size="large"
+              disabled={loading}
               sx={{ 
                 mt: 3,
                 py: 1.5,
@@ -210,7 +300,14 @@ const Register: React.FC = () => {
                 }
               }}
             >
-              Create Account
+              {loading ? (
+                <>
+                  <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
+                  Creating Account...
+                </>
+              ) : (
+                'Create Account'
+              )}
             </Button>
           </Box>
 
@@ -228,6 +325,10 @@ const Register: React.FC = () => {
               size="large"
               startIcon={<Google />}
               sx={{ mb: 2, py: 1.5 }}
+              onClick={() => {
+                // TODO: Implement Google OAuth
+                alert('Google OAuth coming soon!');
+              }}
             >
               Sign up with Google
             </Button>
@@ -237,6 +338,10 @@ const Register: React.FC = () => {
               size="large"
               startIcon={<Facebook />}
               sx={{ py: 1.5 }}
+              onClick={() => {
+                // TODO: Implement Facebook OAuth
+                alert('Facebook OAuth coming soon!');
+              }}
             >
               Sign up with Facebook
             </Button>
