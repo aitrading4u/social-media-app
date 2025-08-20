@@ -1,19 +1,17 @@
 {
-  "name": "tipper-frontend",
+  "name": "social-media-app",
   "version": "1.0.0",
-  "description": "TIPPER Social Media Frontend",
-  "main": "index.js",
+  "description": "Full-stack social media platform with real-time features",
   "scripts": {
-    "start": "cd client && npm start",
-    "build": "cd client && npm run build",
-    "install:client": "cd client && npm install"
+    "build": "cd client && npm install && npm run build",
+    "vercel-build": "cd client && npm install && npm run build",
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm start\"",
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install"
   },
-  "keywords": [
-    "social-media",
-    "tipping",
-    "react",
-    "frontend"
-  ],
-  "author": "TIPPER Team",
-  "license": "MIT"
+  "keywords": ["social-media", "react", "nodejs", "mongodb"],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
 } 
