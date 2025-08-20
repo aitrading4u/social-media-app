@@ -1,70 +1,72 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
-  Box,
-  TextField,
-  Button,
-  IconButton,
-  Avatar,
-  Chip,
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
+  Button,
+  Box,
   Typography,
-  LinearProgress,
-  useTheme,
-  alpha,
-  Divider,
-  Tooltip,
-  Grid,
-  Card,
-  CardContent,
-  Paper,
   Stepper,
   Step,
   StepLabel,
-  StepContent,
-  Fab
+  IconButton,
+  TextField,
+  Slider,
+  Grid,
+  Card,
+  CardContent,
+  CardMedia,
+  Fab,
+  useTheme,
+  useMediaQuery,
+  Chip,
+  LinearProgress
 } from '@mui/material';
 import {
-  PhotoCamera as PhotoIcon,
-  Videocam as VideoIcon,
-  Public as PublicIcon,
-  People as PeopleIcon,
-  Lock as LockIcon,
   Close as CloseIcon,
-  Add as AddIcon,
-  Delete as DeleteIcon,
+  CameraAlt as CameraIcon,
+  PhotoCamera as PhotoCameraIcon,
+  Videocam as VideocamIcon,
   Edit as EditIcon,
-  FilterAlt as FilterIcon,
-  Tune as AdjustIcon,
-  TextFields as TextIcon,
-  EmojiEmotions as StickerIcon,
   Save as SaveIcon,
-  Undo as UndoIcon,
-  Redo as RedoIcon,
-  RotateLeft as RotateLeftIcon,
-  RotateRight as RotateRightIcon,
+  Cancel as CancelIcon,
+  NavigateNext as NextIcon,
+  NavigateBefore as BackIcon,
+  Brightness4 as BrightnessIcon,
+  Contrast as ContrastIcon,
+  Palette as PaletteIcon,
+  Refresh as RefreshIcon,
+  Crop as CropIcon,
+  Rotate90DegreesCcw as RotateIcon,
   Flip as FlipIcon,
   ZoomIn as ZoomInIcon,
   ZoomOut as ZoomOutIcon,
   AspectRatio as AspectRatioIcon,
-  Create as DrawIcon,
-  Refresh as RefreshIcon,
-  CameraAlt as CameraIcon,
-  Camera as CameraCaptureIcon,
+  Brush as BrushIcon,
   Stop as StopIcon,
-  FlipCameraIos as FlipCameraIcon,
-  BrightnessHigh as BrightnessIcon,
-  Contrast as ContrastIcon,
-  Palette as PaletteIcon,
-  BlurOn as BlurOnIcon,
+  PlayArrow as PlayIcon,
+  Pause as PauseIcon,
+  Mic as MicIcon,
+  MicOff as MicOffIcon,
+  VolumeUp as VolumeIcon,
+  VolumeOff as VolumeOffIcon,
   WbSunny as WbSunnyIcon,
   Exposure as ExposureIcon,
   Grain as GrainIcon,
-  ArrowBack as ArrowBackIcon,
+  FilterAlt as FilterAltIcon,
   ArrowForward as ArrowForwardIcon,
-  Check as CheckIcon
+  BlurOn as BlurOnIcon,
+  Undo as UndoIcon,
+  Redo as RedoIcon,
+  Check as CheckIcon,
+  Public as PublicIcon,
+  People as PeopleIcon,
+  Lock as LockIcon,
+  Camera as CameraCaptureIcon,
+  FlipCameraIos as FlipCameraIcon
 } from '@mui/icons-material';
+import PhotoEditor from '../PhotoEditor/PhotoEditor';
 import { useAuthStore } from '../../stores/authStore';
 
 interface CreatePostProps {
@@ -381,7 +383,7 @@ const CreatePostNew: React.FC<CreatePostProps> = ({ open, onClose, onPostCreated
         <Box display="flex" alignItems="center" gap={2}>
           {currentStep !== 'capture' && (
             <IconButton onClick={() => setCurrentStep('capture')} size="small">
-              <ArrowBackIcon />
+              <BackIcon />
             </IconButton>
           )}
           <Typography variant="h6">Create Post</Typography>
@@ -418,7 +420,7 @@ const CreatePostNew: React.FC<CreatePostProps> = ({ open, onClose, onPostCreated
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <CardContent sx={{ textAlign: 'center', p: 4 }}>
-                      <PhotoIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
+                      <PhotoCameraIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
                       <Typography variant="h6" gutterBottom>
                         Choose Photo/Video
                       </Typography>
@@ -494,13 +496,13 @@ const CreatePostNew: React.FC<CreatePostProps> = ({ open, onClose, onPostCreated
                   <Typography variant="caption">Brightness</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <BrightnessIcon fontSize="small" />
-                    <input
-                      type="range"
-                      min="0"
-                      max="200"
+                    <Slider
                       value={brightness}
-                      onChange={(e) => setBrightness(Number(e.target.value))}
-                      style={{ flex: 1 }}
+                      onChange={(e, value) => setBrightness(value as number)}
+                      min={0}
+                      max={200}
+                      valueLabelDisplay="auto"
+                      sx={{ width: 100 }}
                     />
                   </Box>
                 </Grid>
@@ -509,13 +511,13 @@ const CreatePostNew: React.FC<CreatePostProps> = ({ open, onClose, onPostCreated
                   <Typography variant="caption">Contrast</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <ContrastIcon fontSize="small" />
-                    <input
-                      type="range"
-                      min="0"
-                      max="200"
+                    <Slider
                       value={contrast}
-                      onChange={(e) => setContrast(Number(e.target.value))}
-                      style={{ flex: 1 }}
+                      onChange={(e, value) => setContrast(value as number)}
+                      min={0}
+                      max={200}
+                      valueLabelDisplay="auto"
+                      sx={{ width: 100 }}
                     />
                   </Box>
                 </Grid>
@@ -524,13 +526,13 @@ const CreatePostNew: React.FC<CreatePostProps> = ({ open, onClose, onPostCreated
                   <Typography variant="caption">Saturation</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <PaletteIcon fontSize="small" />
-                    <input
-                      type="range"
-                      min="0"
-                      max="200"
+                    <Slider
                       value={saturation}
-                      onChange={(e) => setSaturation(Number(e.target.value))}
-                      style={{ flex: 1 }}
+                      onChange={(e, value) => setSaturation(value as number)}
+                      min={0}
+                      max={200}
+                      valueLabelDisplay="auto"
+                      sx={{ width: 100 }}
                     />
                   </Box>
                 </Grid>
@@ -539,13 +541,13 @@ const CreatePostNew: React.FC<CreatePostProps> = ({ open, onClose, onPostCreated
                   <Typography variant="caption">Blur</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <BlurOnIcon fontSize="small" />
-                    <input
-                      type="range"
-                      min="0"
-                      max="20"
+                    <Slider
                       value={blur}
-                      onChange={(e) => setBlur(Number(e.target.value))}
-                      style={{ flex: 1 }}
+                      onChange={(e, value) => setBlur(value as number)}
+                      min={0}
+                      max={20}
+                      valueLabelDisplay="auto"
+                      sx={{ width: 100 }}
                     />
                   </Box>
                 </Grid>
