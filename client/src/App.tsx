@@ -1,4 +1,5 @@
 // Force new deployment - Build fix applied
+// DEPLOYMENT TRIGGER: Latest commit d24985c with all build fixes
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
