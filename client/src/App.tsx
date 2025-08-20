@@ -1,5 +1,6 @@
 // Force new deployment - Build fix applied
-// DEPLOYMENT TRIGGER: Latest commit d24985c with all build fixes
+// DEPLOYMENT TRIGGER: Latest commit d748f19 with all build fixes
+// VERCEL DEPLOYMENT FIX: This should trigger a new build with updated config
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
