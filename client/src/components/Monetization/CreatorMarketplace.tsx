@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
+  Typography,
+  Grid,
   Card,
   CardContent,
   CardMedia,
-  Typography,
   Button,
   Chip,
-  useTheme,
-  alpha,
-  Grid,
+  Rating,
   Avatar,
   IconButton,
   Dialog,
@@ -17,45 +16,32 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Rating,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  ListItemSecondaryAction,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Alert,
+  Snackbar,
+  Badge,
   Tabs,
   Tab,
-  Badge,
-  Tooltip,
-  Snackbar,
-  Alert,
-  CircularProgress,
-  Divider,
-  FormControl,
-  MenuItem,
-  Select
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
   ShoppingCart as CartIcon,
-  Favorite as LikeIcon,
-  FavoriteBorder as LikeOutlineIcon,
-  Star as StarIcon,
-  StarBorder as StarOutlineIcon,
-  Share as ShareIcon,
-  BookmarkBorder as BookmarkIcon,
-  Bookmark as BookmarkFilledIcon,
+  Favorite as HeartIcon,
+  FavoriteBorder as HeartOutlineIcon,
+  Visibility as ViewIcon,
+  VisibilityOff as ViewOffIcon,
+  Warning as WarningIcon,
+  CheckCircle as CheckIcon,
+  Cancel as CancelIcon,
   Add as AddIcon,
   Remove as RemoveIcon,
-  MonetizationOn as MonetizationIcon,
-  Verified as VerifiedIcon,
   LocalOffer as OfferIcon,
   TrendingUp as TrendingIcon,
-  FilterList as FilterIcon,
-  Search as SearchIcon,
-  Warning as WarningIcon,
-  Block as BlockIcon,
-  Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon
+  FilterList as FilterIcon
 } from '@mui/icons-material';
 import { useAuthStore } from '../../stores/authStore';
 
@@ -511,7 +497,7 @@ const CreatorMarketplace: React.FC<CreatorMarketplaceProps> = ({
           <Button
             variant={showAdultContent ? "contained" : "outlined"}
             color="warning"
-            startIcon={showAdultContent ? <VisibilityIcon /> : <VisibilityOffIcon />}
+            startIcon={showAdultContent ? <ViewIcon /> : <ViewOffIcon />}
             onClick={handleShowAdultContent}
             sx={{ 
               borderColor: theme.palette.warning.main,
@@ -555,7 +541,7 @@ const CreatorMarketplace: React.FC<CreatorMarketplaceProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               InputProps={{
-                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                startAdornment: <FilterIcon sx={{ mr: 1, color: 'text.secondary' }} />
               }}
               sx={{ minWidth: 250 }}
             />
@@ -617,7 +603,7 @@ const CreatorMarketplace: React.FC<CreatorMarketplaceProps> = ({
                       <Typography variant="caption" sx={{ fontWeight: 600 }}>
                         {product.creator.name}
                       </Typography>
-                      {product.creator.isVerified && <VerifiedIcon color="primary" fontSize="small" />}
+                      {product.creator.isVerified && <CheckIcon color="primary" fontSize="small" />}
                     </Box>
                     
                     <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, lineHeight: 1.2 }}>
@@ -683,7 +669,7 @@ const CreatorMarketplace: React.FC<CreatorMarketplaceProps> = ({
                             handleLike(product.id);
                           }}
                         >
-                          {product.isLiked ? <LikeIcon color="error" /> : <LikeOutlineIcon />}
+                          {product.isLiked ? <HeartIcon color="error" /> : <HeartOutlineIcon />}
                         </IconButton>
                         <IconButton
                           size="small"
@@ -692,10 +678,10 @@ const CreatorMarketplace: React.FC<CreatorMarketplaceProps> = ({
                             handleBookmark(product.id);
                           }}
                         >
-                          {product.isBookmarked ? <BookmarkFilledIcon color="primary" /> : <BookmarkIcon />}
+                          {product.isBookmarked ? <CheckIcon color="primary" /> : <CancelIcon />}
                         </IconButton>
                         <IconButton size="small">
-                          <ShareIcon />
+                          <OfferIcon />
                         </IconButton>
                       </Box>
                       <Button
@@ -732,42 +718,33 @@ const CreatorMarketplace: React.FC<CreatorMarketplaceProps> = ({
               </Typography>
             </Box>
           ) : (
-            <List>
+            <Box>
               {cartItems.map((item) => (
-                <ListItem key={item.id} sx={{ px: 0 }}>
-                  <ListItemAvatar>
-                    <Avatar src={item.images[0]} variant="rounded" sx={{ width: 80, height: 80 }} />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        {item.title}
-                      </Typography>
-                    }
-                    secondary={
-                      <Box>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                          by {item.creator.name}
-                        </Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
-                          {formatPrice(item.price)}
-                        </Typography>
-                      </Box>
-                    }
-                  />
-                  <ListItemSecondaryAction>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      onClick={() => handleRemoveFromCart(item.id)}
-                    >
-                      Remove
-                    </Button>
-                  </ListItemSecondaryAction>
-                </ListItem>
+                <Box key={item.id} sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Avatar src={item.images[0]} variant="rounded" sx={{ width: 80, height: 80, mr: 2 }} />
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {item.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      by {item.creator.name}
+                    </Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
+                      {formatPrice(item.price)}
+                    </Typography>
+                  </Box>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveFromCart(item.id);
+                    }}
+                  >
+                    <RemoveIcon />
+                  </IconButton>
+                </Box>
               ))}
-              <Divider sx={{ my: 2 }} />
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                   Total: {formatPrice(cartItems.reduce((sum, item) => sum + item.price, 0))}
                 </Typography>
@@ -775,7 +752,7 @@ const CreatorMarketplace: React.FC<CreatorMarketplaceProps> = ({
                   Checkout
                 </Button>
               </Box>
-            </List>
+            </Box>
           )}
         </Box>
       )}
@@ -783,7 +760,7 @@ const CreatorMarketplace: React.FC<CreatorMarketplaceProps> = ({
       {/* My Purchases Tab */}
       {activeTab === 2 && (
         <Box sx={{ textAlign: 'center', py: 8 }}>
-          <MonetizationIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+          <OfferIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
           <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
             No purchases yet
           </Typography>
@@ -838,7 +815,7 @@ const CreatorMarketplace: React.FC<CreatorMarketplaceProps> = ({
                           {selectedProduct.creator.followers.toLocaleString()} followers
                         </Typography>
                       </Box>
-                      {selectedProduct.creator.isVerified && <VerifiedIcon color="primary" />}
+                      {selectedProduct.creator.isVerified && <CheckIcon color="primary" />}
                     </Box>
                     
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
@@ -954,7 +931,7 @@ const CreatorMarketplace: React.FC<CreatorMarketplaceProps> = ({
       >
         <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 2 }}>
-            <BlockIcon color="error" sx={{ fontSize: 32 }} />
+            <CancelIcon color="error" sx={{ fontSize: 32 }} />
             <Typography variant="h5" sx={{ fontWeight: 'bold', color: theme.palette.error.main }}>
               Content Warning
             </Typography>
