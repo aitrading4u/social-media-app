@@ -10,13 +10,13 @@ const router = express.Router();
 const generateTokens = (userId) => {
   const accessToken = jwt.sign(
     { userId },
-    process.env.JWT_SECRET,
+    process.env.JWT_SECRET || 'fallback-secret-key',
     { expiresIn: '15m' }
   );
   
   const refreshToken = jwt.sign(
     { userId },
-    process.env.JWT_REFRESH_SECRET,
+    process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'fallback-secret-key',
     { expiresIn: '7d' }
   );
   
