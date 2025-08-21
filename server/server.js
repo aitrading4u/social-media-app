@@ -42,6 +42,13 @@ const connectDB = async () => {
   try {
     const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/freedom_social';
     console.log('🔗 Attempting to connect to MongoDB...');
+    console.log('🔗 MongoDB URI:', mongoURI ? 'Set' : 'Not set');
+    
+    if (!process.env.MONGODB_URI) {
+      console.log('⚠️  MONGODB_URI environment variable not set');
+      console.log('⚠️  Server will continue without database connection');
+      return;
+    }
     
     await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
@@ -70,13 +77,29 @@ app.use('/api/tokens', require('./routes/tokens'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/messages', require('./routes/messages'));
 
-// Health check
+// Health check with detailed information
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+  const healthInfo = {
+    status: 'OK',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    environment: process.env.NODE_ENV || 'development',
+    mongodb_uri_set: !!process.env.MONGODB_URI,
+    jwt_secret_set: !!process.env.JWT_SECRET,
+    cloudinary_set: !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET)
+  };
+  
+  console.log('🏥 Health check requested:', healthInfo);
+  res.json(healthInfo);
+});
+
+// Test endpoint for registration
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    message: 'Server is working!',
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV || 'development'
   });
 });
 
@@ -127,6 +150,7 @@ app.use((err, req, res, next) => {
 
 // 404 handler
 app.use('*', (req, res) => {
+  console.log('❌ Route not found:', req.originalUrl);
   res.status(404).json({ error: 'Route not found' });
 });
 
@@ -136,6 +160,7 @@ server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`🔗 Test endpoint: http://localhost:${PORT}/api/test`);
 });
 
 module.exports = { app, server, io }; 
