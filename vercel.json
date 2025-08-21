@@ -31,8 +31,12 @@
       "dest": "/client/favicon.ico"
     },
     {
+      "src": "/asset-manifest.json",
+      "dest": "/client/asset-manifest.json"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/client/$1"
+      "dest": "/client/index.html"
     }
   ],
   "env": {
