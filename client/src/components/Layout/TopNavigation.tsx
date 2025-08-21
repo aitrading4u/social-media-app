@@ -17,14 +17,17 @@ import {
 import {
   Search as SearchIcon,
   Person as PersonIcon,
-  Explore as ExploreIcon,
+
   LiveTv as LiveIcon,
   Analytics as AnalyticsIcon,
   Psychology as AIIcon,
   ShoppingCart as MarketplaceIcon,
   Settings as SettingsIcon,
   Logout as LogoutIcon,
-  GetApp as GetAppIcon
+  GetApp as GetAppIcon,
+  Notifications as NotificationsIcon,
+  Message as MessageIcon,
+  Add as AddIcon
 } from '@mui/icons-material';
 import SearchDropdown from '../Common/SearchDropdown';
 import { searchContent, SearchResult } from '../../services/searchService';
@@ -32,6 +35,7 @@ import { UserProfile, Post } from '../../services/mockProfileService';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import InstallGuide from '../PWA/InstallGuide';
+import CreatePost from '../Posts/CreatePost';
 
 // Styled search component
 const Search = styled('div')(({ theme }) => ({
@@ -80,6 +84,7 @@ const TopNavigation: React.FC = () => {
   const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [showInstallGuide, setShowInstallGuide] = useState(false);
+  const [showCreatePost, setShowCreatePost] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
@@ -91,6 +96,20 @@ const TopNavigation: React.FC = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleCreatePost = () => {
+    setShowCreatePost(true);
+    handleClose();
+  };
+
+  const handleCloseCreatePost = () => {
+    setShowCreatePost(false);
+  };
+
+  const handlePostCreated = (post: any) => {
+    setShowCreatePost(false);
+    console.log('Post created:', post);
   };
 
   // Debounced search
@@ -167,9 +186,9 @@ const TopNavigation: React.FC = () => {
   }
 
   return (
-    <AppBar 
-      position="fixed" 
-      sx={{ 
+    <AppBar
+      position="fixed"
+      sx={{
         zIndex: 1200,
         background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
@@ -182,7 +201,7 @@ const TopNavigation: React.FC = () => {
           noWrap
           component="div"
           onClick={() => navigate('/')}
-          sx={{ 
+          sx={{
             display: { xs: 'none', sm: 'block' },
             fontWeight: 'bold',
             color: 'white',
@@ -225,21 +244,7 @@ const TopNavigation: React.FC = () => {
 
           {/* Navigation Icons */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton 
-              color="inherit"
-              onClick={() => navigate('/search')}
-              sx={{ 
-                '&:hover': { 
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  transform: 'scale(1.1)'
-                },
-                transition: 'all 0.2s ease-in-out'
-              }}
-            >
-              <ExploreIcon />
-            </IconButton>
-
-            <IconButton 
+            <IconButton
               color="inherit"
               onClick={() => navigate('/live')}
               sx={{ 
@@ -270,8 +275,8 @@ const TopNavigation: React.FC = () => {
             <IconButton 
               color="inherit"
               onClick={() => navigate('/ai-recommendations')}
-              sx={{ 
-                '&:hover': { 
+              sx={{
+                '&:hover': {
                   backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   transform: 'scale(1.1)'
                 },
@@ -281,11 +286,11 @@ const TopNavigation: React.FC = () => {
               <AIIcon />
             </IconButton>
 
-            <IconButton 
+            <IconButton
               color="inherit"
               onClick={() => navigate('/marketplace')}
-              sx={{ 
-                '&:hover': { 
+              sx={{
+                '&:hover': {
                   backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   transform: 'scale(1.1)'
                 },
@@ -295,11 +300,7 @@ const TopNavigation: React.FC = () => {
               <MarketplaceIcon />
             </IconButton>
 
-
-
-
-
-            <IconButton 
+            <IconButton
               color="inherit"
               onClick={() => setShowInstallGuide(true)}
               sx={{ 
@@ -321,8 +322,8 @@ const TopNavigation: React.FC = () => {
               aria-haspopup="true"
               onClick={handleMenu}
               color="inherit"
-              sx={{ 
-                '&:hover': { 
+              sx={{
+                '&:hover': {
                   backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   transform: 'scale(1.1)'
                 },
@@ -359,7 +360,7 @@ const TopNavigation: React.FC = () => {
           }}
           open={Boolean(anchorEl)}
           onClose={handleClose}
-          sx={{ 
+          sx={{
             zIndex: 1300,
             '& .MuiPaper-root': {
               borderRadius: 2,
@@ -372,6 +373,18 @@ const TopNavigation: React.FC = () => {
             <PersonIcon sx={{ mr: 2, color: theme.palette.primary.main }} />
             Perfil
           </MenuItem>
+          <MenuItem onClick={() => { handleClose(); navigate('/notifications'); }}>
+            <NotificationsIcon sx={{ mr: 2, color: theme.palette.warning.main }} />
+            Notificaciones
+          </MenuItem>
+          <MenuItem onClick={() => { handleClose(); navigate('/messages'); }}>
+            <MessageIcon sx={{ mr: 2, color: theme.palette.secondary.main }} />
+            Mensajes
+          </MenuItem>
+          <MenuItem onClick={handleCreatePost}>
+            <AddIcon sx={{ mr: 2, color: theme.palette.success.main }} />
+            Crear Post
+          </MenuItem>
           <MenuItem onClick={() => { handleClose(); navigate('/settings'); }}>
             <SettingsIcon sx={{ mr: 2, color: theme.palette.secondary.main }} />
             Configuración
@@ -382,11 +395,18 @@ const TopNavigation: React.FC = () => {
           </MenuItem>
         </Menu>
       </Toolbar>
-      
+
       {/* Install Guide Dialog */}
-      <InstallGuide 
-        open={showInstallGuide} 
-        onClose={() => setShowInstallGuide(false)} 
+      <InstallGuide
+        open={showInstallGuide}
+        onClose={() => setShowInstallGuide(false)}
+      />
+
+      {/* Create Post Dialog */}
+      <CreatePost
+        open={showCreatePost}
+        onClose={handleCloseCreatePost}
+        onPostCreated={handlePostCreated}
       />
     </AppBar>
   );
