@@ -1,10 +1,11 @@
 // Force new deployment - Build fix applied
 // DEPLOYMENT TRIGGER: Latest commit d748f19 with all build fixes
 // VERCEL DEPLOYMENT FIX: This should trigger a new build with updated config
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { CircularProgress, Box } from '@mui/material';
 import Home from './pages/Home';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
@@ -108,10 +109,36 @@ const theme = createTheme({
 });
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     // Setup global error handler
     setupGlobalErrorHandler();
+    
+    // Simulate a small delay to ensure everything is loaded
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
   }, []);
+
+  if (isLoading) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="100vh"
+          bgcolor="background.default"
+        >
+          <CircularProgress size={60} color="primary" />
+        </Box>
+      </ThemeProvider>
+    );
+  }
 
   return (
     <ErrorBoundary>
