@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+  baseURL: process.env.REACT_APP_API_URL || '/api',
   timeout: 30000, // Increased timeout for file uploads
   headers: {
     'Content-Type': 'application/json',
@@ -12,14 +12,14 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken');  // Get token from local storage
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
-    return Promise.reject(error);
+    return Promise.reject(error);  // Reject the error
   }
 );
 
@@ -32,7 +32,7 @@ api.interceptors.response.use(
       const refreshToken = localStorage.getItem('refreshToken');
       if (refreshToken) {
         try {
-          const response = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/auth/refresh`, {
+          const response = await axios.post(`${process.env.REACT_APP_API_URL || '/api'}/auth/refresh`, {
             refreshToken,
           });
           localStorage.setItem('accessToken', response.data.accessToken);
