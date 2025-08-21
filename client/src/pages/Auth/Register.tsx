@@ -65,6 +65,13 @@ const Register: React.FC = () => {
       return;
     }
 
+    // Check if all required fields are filled
+    if (!formData.username || !formData.firstName || !formData.lastName || !formData.email || !formData.dateOfBirth) {
+      setError('Please fill in all required fields');
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -82,6 +89,12 @@ const Register: React.FC = () => {
         }),
       });
 
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server returned an invalid response. Please try again later.');
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
@@ -95,7 +108,12 @@ const Register: React.FC = () => {
       navigate('/');
       
     } catch (err: any) {
-      setError(err.message || 'Registration failed. Please try again.');
+      console.error('Registration error:', err);
+      if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+        setError('Unable to connect to server. Please check your internet connection and try again.');
+      } else {
+        setError(err.message || 'Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -285,6 +303,13 @@ const Register: React.FC = () => {
               </Alert>
             )}
 
+            {/* Demo Mode Alert */}
+            <Alert severity="info" sx={{ mt: 2, mb: 2 }}>
+              <Typography variant="body2">
+                <strong>Demo Mode:</strong> If registration fails, you can use demo mode to explore the application.
+              </Typography>
+            </Alert>
+
             <Button
               type="submit"
               fullWidth
@@ -316,6 +341,30 @@ const Register: React.FC = () => {
               OR
             </Typography>
           </Divider>
+
+          {/* Demo Mode Button */}
+          <Box sx={{ mb: 3 }}>
+            <Button
+              fullWidth
+              variant="contained"
+              size="large"
+              color="secondary"
+              sx={{ 
+                py: 1.5,
+                background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)'
+                }
+              }}
+              onClick={() => {
+                const { enableDemoMode } = useAuthStore.getState();
+                enableDemoMode();
+                navigate('/');
+              }}
+            >
+              Try Demo Mode
+            </Button>
+          </Box>
 
           {/* Social Register */}
           <Box sx={{ mb: 3 }}>
