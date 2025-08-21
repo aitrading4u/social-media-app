@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { CircularProgress, Box } from '@mui/material';
+import { CircularProgress, Box, Typography } from '@mui/material';
 import Home from './pages/Home';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
@@ -110,18 +110,56 @@ const theme = createTheme({
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Setup global error handler
-    setupGlobalErrorHandler();
+    console.log('🚀 App starting...');
     
-    // Simulate a small delay to ensure everything is loaded
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    try {
+      // Setup global error handler
+      setupGlobalErrorHandler();
+      console.log('✅ Error handler setup complete');
+      
+      // Simulate a small delay to ensure everything is loaded
+      const timer = setTimeout(() => {
+        console.log('✅ Loading complete, showing app');
+        setIsLoading(false);
+      }, 1000);
 
-    return () => clearTimeout(timer);
+      return () => clearTimeout(timer);
+    } catch (err) {
+      console.error('❌ Error during app initialization:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setIsLoading(false);
+    }
   }, []);
+
+  if (error) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Box
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="100vh"
+          bgcolor="background.default"
+          p={3}
+        >
+          <Typography variant="h4" color="error" gutterBottom>
+            App Error
+          </Typography>
+          <Typography variant="body1" color="text.secondary" align="center">
+            {error}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 2 }}>
+            Please refresh the page or check the console for more details.
+          </Typography>
+        </Box>
+      </ThemeProvider>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -129,16 +167,22 @@ function App() {
         <CssBaseline />
         <Box
           display="flex"
+          flexDirection="column"
           justifyContent="center"
           alignItems="center"
           minHeight="100vh"
           bgcolor="background.default"
         >
           <CircularProgress size={60} color="primary" />
+          <Typography variant="h6" sx={{ mt: 2, color: 'text.secondary' }}>
+            Loading Social Media App...
+          </Typography>
         </Box>
       </ThemeProvider>
     );
   }
+
+  console.log('🎯 Rendering main app...');
 
   return (
     <ErrorBoundary>
