@@ -13,7 +13,10 @@ import {
   Explore as ExploreIcon,
   AccountCircle as ProfileIcon,
   MonetizationOn as TokenIcon,
-  Close as CloseIcon
+  Close as CloseIcon,
+  Message as MessageIcon,
+  Notifications as NotificationsIcon,
+  Add as AddIcon
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
@@ -21,6 +24,7 @@ import TokenBalance from '../Tokens/TokenBalance';
 import PurchaseTokens from '../Tokens/PurchaseTokens';
 import TopNavigation from './TopNavigation';
 import Breadcrumbs from '../Common/Breadcrumbs';
+import CreatePost from '../Posts/CreatePost';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -36,6 +40,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // State for token balance panel
   const [showTokenBalance, setShowTokenBalance] = useState(false);
   const [showPurchaseTokens, setShowPurchaseTokens] = useState(false);
+  const [showCreatePost, setShowCreatePost] = useState(false);
 
   const navigationItems = [
     { icon: <HomeIcon />, label: 'Inicio', path: '/' },
@@ -60,13 +65,26 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     setShowPurchaseTokens(false);
   };
 
+  const handleCreatePost = () => {
+    setShowCreatePost(true);
+  };
+
+  const handleCloseCreatePost = () => {
+    setShowCreatePost(false);
+  };
+
+  const handlePostCreated = (post: any) => {
+    setShowCreatePost(false);
+    console.log('Post created:', post);
+  };
+
   const handlePurchase = async (amount: number, currency: string, paymentMethod: string) => {
     // Demo mode - simulate purchase
     console.log('Purchase tokens:', { amount, currency, paymentMethod });
-    
+
     // In a real app, this would make an API call to process the payment
     await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
-    
+
     // Show success message (you could add a snackbar here)
     alert(`¡Compra exitosa! Has comprado ${amount} tokens por ${currency} usando ${paymentMethod}`);
   };
@@ -116,7 +134,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
       {/* Main Content */}
       <Box 
-        sx={{ 
+        sx={{
           paddingTop: '64px', // Height of AppBar
           paddingBottom: isMobile ? '80px' : '20px', // Space for bottom nav on mobile
           minHeight: '100vh'
@@ -152,6 +170,67 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           onClick={handleTokenBalanceClick}
         >
           <TokenIcon />
+        </Fab>
+      </Box>
+
+      {/* Messages, Notifications, and Create Post Buttons - Bottom Right */}
+      <Box
+        sx={{
+          position: 'fixed',
+          bottom: isMobile ? 100 : 20,
+          right: 20,
+          zIndex: 1300,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1
+        }}
+      >
+        {/* Messages Button */}
+        <Fab
+          size="medium"
+          sx={{
+            backgroundColor: 'secondary.main',
+            color: 'white',
+            '&:hover': {
+              backgroundColor: 'secondary.dark'
+            }
+          }}
+          onClick={() => navigate('/messages')}
+        >
+          <MessageIcon />
+        </Fab>
+
+        {/* Notifications Button */}
+        <Fab
+          size="medium"
+          sx={{
+            backgroundColor: 'warning.main',
+            color: 'white',
+            '&:hover': {
+              backgroundColor: 'warning.dark'
+            }
+          }}
+          onClick={() => navigate('/notifications')}
+        >
+          <NotificationsIcon />
+        </Fab>
+
+        {/* Create Post Button */}
+        <Fab
+          size="large"
+          sx={{
+            backgroundColor: 'primary.main',
+            color: 'white',
+            '&:hover': {
+              backgroundColor: 'primary.dark',
+              transform: 'scale(1.1)'
+            },
+            transition: 'all 0.2s ease-in-out',
+            boxShadow: '0 4px 20px rgba(139, 92, 246, 0.3)'
+          }}
+          onClick={handleCreatePost}
+        >
+          <AddIcon />
         </Fab>
       </Box>
 
@@ -200,7 +279,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           {/* Content */}
           <Box sx={{ maxHeight: 'calc(60vh - 60px)', overflow: 'auto' }}>
             <Box sx={{ p: 2 }}>
-              <TokenBalance 
+              <TokenBalance
                 balance={1000}
                 earned={2500}
                 spent={1500}
@@ -217,6 +296,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         open={showPurchaseTokens}
         onClose={handleClosePurchaseTokens}
         onPurchase={handlePurchase}
+      />
+
+      {/* Create Post Dialog */}
+      <CreatePost
+        open={showCreatePost}
+        onClose={handleCloseCreatePost}
+        onPostCreated={handlePostCreated}
       />
     </Box>
   );
