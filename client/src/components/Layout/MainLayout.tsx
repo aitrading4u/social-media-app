@@ -10,12 +10,10 @@ import {
 } from '@mui/material';
 import {
   Home as HomeIcon,
-  Explore as ExploreIcon,
+  Search as SearchIcon,
   AccountCircle as ProfileIcon,
   MonetizationOn as TokenIcon,
   Close as CloseIcon,
-  Message as MessageIcon,
-  Notifications as NotificationsIcon,
   Add as AddIcon
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -44,7 +42,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   const navigationItems = [
     { icon: <HomeIcon />, label: 'Inicio', path: '/' },
-    { icon: <ExploreIcon />, label: 'Explorar', path: '/explore' },
+    { icon: <SearchIcon />, label: 'Buscar', path: '/search' },
     { icon: <ProfileIcon />, label: 'Perfil', path: `/profile/${user?.username || 'demo_user'}` }
   ];
 
@@ -173,49 +171,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </Fab>
       </Box>
 
-      {/* Messages, Notifications, and Create Post Buttons - Bottom Right */}
+      {/* Create Post Button - Bottom Right */}
       <Box
         sx={{
           position: 'fixed',
           bottom: isMobile ? 100 : 20,
           right: 20,
-          zIndex: 1300,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 1
+          zIndex: 1300
         }}
       >
-        {/* Messages Button */}
-        <Fab
-          size="medium"
-          sx={{
-            backgroundColor: 'secondary.main',
-            color: 'white',
-            '&:hover': {
-              backgroundColor: 'secondary.dark'
-            }
-          }}
-          onClick={() => navigate('/messages')}
-        >
-          <MessageIcon />
-        </Fab>
-
-        {/* Notifications Button */}
-        <Fab
-          size="medium"
-          sx={{
-            backgroundColor: 'warning.main',
-            color: 'white',
-            '&:hover': {
-              backgroundColor: 'warning.dark'
-            }
-          }}
-          onClick={() => navigate('/notifications')}
-        >
-          <NotificationsIcon />
-        </Fab>
-
-        {/* Create Post Button */}
         <Fab
           size="large"
           sx={{
