@@ -6,7 +6,8 @@ import {
   Fab,
   Avatar,
   IconButton,
-  Typography
+  Typography,
+  Badge
 } from '@mui/material';
 import {
   Home as HomeIcon,
@@ -14,7 +15,9 @@ import {
   AccountCircle as ProfileIcon,
   MonetizationOn as TokenIcon,
   Close as CloseIcon,
-  Add as AddIcon
+  Add as AddIcon,
+  Message as MessageIcon,
+  Notifications as NotificationsIcon
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
@@ -171,32 +174,101 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </Fab>
       </Box>
 
-      {/* Create Post Button - Bottom Right */}
-      <Box
-        sx={{
-          position: 'fixed',
-          bottom: isMobile ? 100 : 20,
-          right: 20,
-          zIndex: 1300
-        }}
-      >
-        <Fab
-          size="large"
+      {/* Right Side Buttons - Mobile Only */}
+      {isMobile && (
+        <Box
           sx={{
-            backgroundColor: 'primary.main',
-            color: 'white',
-            '&:hover': {
-              backgroundColor: 'primary.dark',
-              transform: 'scale(1.1)'
-            },
-            transition: 'all 0.2s ease-in-out',
-            boxShadow: '0 4px 20px rgba(139, 92, 246, 0.3)'
+            position: 'fixed',
+            bottom: 100,
+            right: 20,
+            zIndex: 1300,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1
           }}
-          onClick={handleCreatePost}
         >
-          <AddIcon />
-        </Fab>
-      </Box>
+          {/* Messages Button */}
+          <Fab
+            size="medium"
+            sx={{
+              backgroundColor: 'primary.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'primary.dark'
+              }
+            }}
+            onClick={() => navigate('/messages')}
+          >
+            <Badge badgeContent={5} color="error">
+              <MessageIcon />
+            </Badge>
+          </Fab>
+
+          {/* Notifications Button */}
+          <Fab
+            size="medium"
+            sx={{
+              backgroundColor: 'primary.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'primary.dark'
+              }
+            }}
+            onClick={() => navigate('/notifications')}
+          >
+            <Badge badgeContent={3} color="error">
+              <NotificationsIcon />
+            </Badge>
+          </Fab>
+
+          {/* Create Post Button */}
+          <Fab
+            size="large"
+            sx={{
+              backgroundColor: 'primary.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'primary.dark',
+                transform: 'scale(1.1)'
+              },
+              transition: 'all 0.2s ease-in-out',
+              boxShadow: '0 4px 20px rgba(139, 92, 246, 0.3)'
+            }}
+            onClick={handleCreatePost}
+          >
+            <AddIcon />
+          </Fab>
+        </Box>
+      )}
+
+      {/* Desktop Right Side Buttons */}
+      {!isMobile && (
+        <Box
+          sx={{
+            position: 'fixed',
+            bottom: 20,
+            right: 20,
+            zIndex: 1300
+          }}
+        >
+          <Fab
+            size="large"
+            sx={{
+              backgroundColor: 'primary.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'primary.dark',
+                transform: 'scale(1.1)'
+              },
+              transition: 'all 0.2s ease-in-out',
+              boxShadow: '0 4px 20px rgba(139, 92, 246, 0.3)'
+            }}
+            onClick={handleCreatePost}
+          >
+            <AddIcon />
+          </Fab>
+        </Box>
+      )}
 
       {/* Token Balance Panel */}
       {showTokenBalance && (
