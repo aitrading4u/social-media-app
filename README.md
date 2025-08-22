@@ -33,4 +33,4 @@ Make sure to set these in your Vercel environment:
 
 ## Deployment Status
 
-**Latest Update**: Environment variables configured for production deployment. 
+**Latest Update**: Mobile layout updated with 3 buttons on right side (Messages, Notifications, Create Post). 
