@@ -38,10 +38,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const location = useLocation();
   const { user } = useAuthStore();
 
-  // Debug logging
-  console.log('MainLayout - isMobile:', isMobile);
-  console.log('MainLayout - current path:', location.pathname);
-
   // State for token balance panel
   const [showTokenBalance, setShowTokenBalance] = useState(false);
   const [showPurchaseTokens, setShowPurchaseTokens] = useState(false);
@@ -52,6 +48,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     { icon: <SearchIcon />, label: 'Buscar', path: '/search' },
     { icon: <ProfileIcon />, label: 'Perfil', path: `/profile/${user?.username || 'demo_user'}` }
   ];
+
+  // Debug logging
+  console.log('MainLayout v2.0 - isMobile:', isMobile);
+  console.log('MainLayout v2.0 - current path:', location.pathname);
+  console.log('MainLayout v2.0 - navigation items:', navigationItems);
 
   const handleTokenBalanceClick = () => {
     setShowTokenBalance(true);
