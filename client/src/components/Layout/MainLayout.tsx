@@ -38,6 +38,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const location = useLocation();
   const { user } = useAuthStore();
 
+  // Debug logging
+  console.log('MainLayout - isMobile:', isMobile);
+  console.log('MainLayout - current path:', location.pathname);
+
   // State for token balance panel
   const [showTokenBalance, setShowTokenBalance] = useState(false);
   const [showPurchaseTokens, setShowPurchaseTokens] = useState(false);
