@@ -345,6 +345,7 @@ const TopNavigation: React.FC = () => {
             }
           }}
         >
+          {/* User Menu Items - Updated with Analytics and Download */}
           <MenuItem onClick={() => { handleClose(); navigate('/profile/demo_user'); }}>
             <PersonIcon sx={{ mr: 2, color: theme.palette.primary.main }} />
             Perfil
