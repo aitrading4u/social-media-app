@@ -50,6 +50,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Debug logging
   console.log('MainLayout v2.0 - isMobile:', isMobile);
   console.log('MainLayout v2.0 - current path:', location.pathname);
+  console.log('MainLayout v2.0 - window width:', window.innerWidth);
+  console.log('MainLayout v2.0 - theme breakpoints:', theme.breakpoints.down('md'));
 
   // State for token balance panel
   const [showTokenBalance, setShowTokenBalance] = useState(false);
