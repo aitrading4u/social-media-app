@@ -24,8 +24,7 @@ import ProtectedRoute from './components/Auth/ProtectedRoute';
 import ErrorBoundary from './components/Common/ErrorBoundary';
 import { ToastProvider } from './components/Common/ToastProvider';
 import { setupGlobalErrorHandler } from './utils/errorHandler';
-import MessagingApp from './components/Chat/MessagingApp';
-import NotificationsApp from './components/Notifications/NotificationsApp';
+
 import ServiceWorkerRegistration from './components/PWA/ServiceWorkerRegistration';
 import InstallPrompt from './components/PWA/InstallPrompt';
 
@@ -206,10 +205,6 @@ function App() {
               <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             </Routes>
-            
-            {/* Global Floating Action Buttons */}
-            <MessagingApp />
-            <NotificationsApp />
             
             {/* PWA Components */}
             <ServiceWorkerRegistration />
