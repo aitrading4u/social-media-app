@@ -7,7 +7,13 @@ import {
   Avatar,
   IconButton,
   Typography,
-  Badge
+  Badge,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Divider
 } from '@mui/material';
 import {
   Home as HomeIcon,
@@ -17,7 +23,8 @@ import {
   Close as CloseIcon,
   Add as AddIcon,
   Message as MessageIcon,
-  Notifications as NotificationsIcon
+  Notifications as NotificationsIcon,
+  Person as PersonIcon
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
@@ -26,6 +33,8 @@ import PurchaseTokens from '../Tokens/PurchaseTokens';
 import TopNavigation from './TopNavigation';
 import Breadcrumbs from '../Common/Breadcrumbs';
 import CreatePost from '../Posts/CreatePost';
+import MessagesDrawer from './MessagesDrawer';
+import NotificationsDrawer from './NotificationsDrawer';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -38,21 +47,24 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const location = useLocation();
   const { user } = useAuthStore();
 
+  // Debug logging
+  console.log('MainLayout v2.0 - isMobile:', isMobile);
+  console.log('MainLayout v2.0 - current path:', location.pathname);
+
   // State for token balance panel
   const [showTokenBalance, setShowTokenBalance] = useState(false);
   const [showPurchaseTokens, setShowPurchaseTokens] = useState(false);
   const [showCreatePost, setShowCreatePost] = useState(false);
+  
+  // State for drawer panels
+  const [showMessagesDrawer, setShowMessagesDrawer] = useState(false);
+  const [showNotificationsDrawer, setShowNotificationsDrawer] = useState(false);
 
   const navigationItems = [
     { icon: <HomeIcon />, label: 'Inicio', path: '/' },
     { icon: <SearchIcon />, label: 'Buscar', path: '/search' },
     { icon: <ProfileIcon />, label: 'Perfil', path: `/profile/${user?.username || 'demo_user'}` }
   ];
-
-  // Debug logging
-  console.log('MainLayout v2.0 - isMobile:', isMobile);
-  console.log('MainLayout v2.0 - current path:', location.pathname);
-  console.log('MainLayout v2.0 - navigation items:', navigationItems);
 
   const handleTokenBalanceClick = () => {
     setShowTokenBalance(true);
@@ -84,6 +96,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     console.log('Post created:', post);
   };
 
+  const handleMessagesClick = () => {
+    setShowMessagesDrawer(true);
+  };
+
+  const handleNotificationsClick = () => {
+    setShowNotificationsDrawer(true);
+  };
+
   const handlePurchase = async (amount: number, currency: string, paymentMethod: string) => {
     // Demo mode - simulate purchase
     console.log('Purchase tokens:', { amount, currency, paymentMethod });
@@ -94,6 +114,22 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     // Show success message (you could add a snackbar here)
     alert(`¡Compra exitosa! Has comprado ${amount} tokens por ${currency} usando ${paymentMethod}`);
   };
+
+  // Mock data for messages
+  const messages = [
+    { id: 1, sender: 'John Doe', message: 'Hey! How are you doing?', time: '2m ago', avatar: 'J' },
+    { id: 2, sender: 'Jane Smith', message: 'Did you see the new post?', time: '5m ago', avatar: 'J' },
+    { id: 3, sender: 'Mike Johnson', message: 'Great work on the project!', time: '1h ago', avatar: 'M' },
+    { id: 4, sender: 'Sarah Chen', message: 'Can we meet tomorrow?', time: '2h ago', avatar: 'S' },
+    { id: 5, sender: 'Alex Rodriguez', message: 'Thanks for the help!', time: '3h ago', avatar: 'A' }
+  ];
+
+  // Mock data for notifications
+  const notifications = [
+    { id: 1, type: 'like', user: 'John Doe', action: 'liked your post', time: '1m ago', avatar: 'J' },
+    { id: 2, type: 'comment', user: 'Jane Smith', action: 'commented on your post', time: '3m ago', avatar: 'J' },
+    { id: 3, type: 'follow', user: 'Mike Johnson', action: 'started following you', time: '10m ago', avatar: 'M' }
+  ];
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: 'grey.50' }}>
@@ -178,7 +214,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 backgroundColor: 'primary.dark'
               }
             }}
-            onClick={() => navigate('/messages')}
+            onClick={handleMessagesClick}
           >
             <Badge badgeContent={5} color="error">
               <MessageIcon />
@@ -195,7 +231,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 backgroundColor: 'primary.dark'
               }
             }}
-            onClick={() => navigate('/notifications')}
+            onClick={handleNotificationsClick}
           >
             <Badge badgeContent={3} color="error">
               <NotificationsIcon />
@@ -320,6 +356,18 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         open={showCreatePost}
         onClose={handleCloseCreatePost}
         onPostCreated={handlePostCreated}
+      />
+
+      {/* Messages Drawer */}
+      <MessagesDrawer 
+        open={showMessagesDrawer}
+        onClose={() => setShowMessagesDrawer(false)}
+      />
+
+      {/* Notifications Drawer */}
+      <NotificationsDrawer 
+        open={showNotificationsDrawer}
+        onClose={() => setShowNotificationsDrawer(false)}
       />
     </Box>
   );
