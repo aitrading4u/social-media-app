@@ -155,30 +155,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         {children}
       </Box>
 
-      {/* Token Balance Button - Bottom Left */}
-      <Box
-        sx={{
-          position: 'fixed',
-          bottom: isMobile ? 100 : 20,
-          left: 20,
-          zIndex: 1300
-        }}
-      >
-        <Fab
-          size="medium"
-          sx={{
-            backgroundColor: 'primary.main',
-            color: 'white',
-            '&:hover': {
-              backgroundColor: 'primary.dark'
-            }
-          }}
-          onClick={handleTokenBalanceClick}
-        >
-          <TokenIcon />
-        </Fab>
-      </Box>
-
       {/* Right Side Buttons - Mobile Only */}
       {isMobile && (
         <Box
