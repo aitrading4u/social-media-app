@@ -258,19 +258,7 @@ const TopNavigation: React.FC = () => {
               <LiveIcon />
             </IconButton>
 
-            <IconButton 
-              color="inherit"
-              onClick={() => navigate('/analytics')}
-              sx={{ 
-                '&:hover': { 
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  transform: 'scale(1.1)'
-                },
-                transition: 'all 0.2s ease-in-out'
-              }}
-            >
-              <AnalyticsIcon />
-            </IconButton>
+
 
             <IconButton 
               color="inherit"
@@ -300,19 +288,7 @@ const TopNavigation: React.FC = () => {
               <MarketplaceIcon />
             </IconButton>
 
-            <IconButton
-              color="inherit"
-              onClick={() => setShowInstallGuide(true)}
-              sx={{ 
-                '&:hover': { 
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  transform: 'scale(1.1)'
-                },
-                transition: 'all 0.2s ease-in-out'
-              }}
-            >
-              <GetAppIcon />
-            </IconButton>
+
 
             {/* User Menu */}
             <IconButton
@@ -385,9 +361,17 @@ const TopNavigation: React.FC = () => {
             <AddIcon sx={{ mr: 2, color: theme.palette.success.main }} />
             Crear Post
           </MenuItem>
+          <MenuItem onClick={() => { handleClose(); navigate('/analytics'); }}>
+            <AnalyticsIcon sx={{ mr: 2, color: theme.palette.info.main }} />
+            Analytics Dashboard
+          </MenuItem>
           <MenuItem onClick={() => { handleClose(); navigate('/settings'); }}>
             <SettingsIcon sx={{ mr: 2, color: theme.palette.secondary.main }} />
             Configuración
+          </MenuItem>
+          <MenuItem onClick={() => { handleClose(); setShowInstallGuide(true); }}>
+            <GetAppIcon sx={{ mr: 2, color: theme.palette.primary.main }} />
+            Descargar App
           </MenuItem>
           <MenuItem onClick={() => { handleClose(); handleLogout(); }}>
             <LogoutIcon sx={{ mr: 2, color: theme.palette.error.main }} />
