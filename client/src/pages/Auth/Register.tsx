@@ -73,6 +73,8 @@ const Register: React.FC = () => {
     }
 
     try {
+      console.log('🔄 Attempting registration...');
+      
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
@@ -89,26 +91,36 @@ const Register: React.FC = () => {
         }),
       });
 
+      console.log('📡 Registration response status:', response.status);
+      console.log('📡 Registration response headers:', response.headers);
+
       // Check if response is JSON
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
+        console.error('❌ Server returned non-JSON response');
         throw new Error('Server returned an invalid response. Please try again later.');
       }
 
       const data = await response.json();
+      console.log('📡 Registration response data:', data);
 
       if (!response.ok) {
+        console.error('❌ Registration failed:', data.error);
         throw new Error(data.error || 'Registration failed');
       }
 
+      console.log('✅ Registration successful, logging in user...');
+      
       // Login the user automatically
       login(data.user, data.accessToken);
+      
+      console.log('✅ User logged in, redirecting to home...');
       
       // Redirect to home page
       navigate('/');
       
     } catch (err: any) {
-      console.error('Registration error:', err);
+      console.error('❌ Registration error:', err);
       if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
         setError('Unable to connect to server. Please check your internet connection and try again.');
       } else {
