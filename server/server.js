@@ -1,9 +1,9 @@
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');
+const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
-console.log('🚀 Server starting - VERSION 2.1 - Registration endpoint fixed');
+console.log('🚀 Server starting - VERSION 3.0 - Using Supabase');
 
 const app = express();
 
@@ -12,37 +12,26 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Simple database connection
-const connectDB = async () => {
+// Supabase client
+let supabase;
+const initSupabase = () => {
   try {
-    if (!process.env.MONGODB_URI) {
-      console.log('⚠️  MONGODB_URI not set - server will run without database');
-      return;
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+      console.log('⚠️  Supabase credentials not set - server will run without database');
+      return false;
     }
     
-    console.log('🔄 Attempting to connect to MongoDB...');
-    console.log('🔗 URI format check:', process.env.MONGODB_URI.substring(0, 30) + '...');
-    console.log('🔗 Full URI length:', process.env.MONGODB_URI.length);
-    console.log('🔗 URI contains database name:', process.env.MONGODB_URI.includes('/freedom_social'));
-    console.log('🔗 URI contains retryWrites:', process.env.MONGODB_URI.includes('retryWrites=true'));
-    
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000, // 5 second timeout
-      socketTimeoutMS: 45000, // 45 second timeout
-    });
-    console.log('✅ MongoDB connected successfully');
-    console.log('📊 Database name:', mongoose.connection.db.databaseName);
+    supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+    console.log('✅ Supabase client initialized');
+    return true;
   } catch (err) {
-    console.error('❌ MongoDB connection failed:', err.message);
-    console.error('🔍 Error details:', err);
-    console.log('⚠️  Server will run without database');
+    console.error('❌ Supabase initialization failed:', err.message);
+    return false;
   }
 };
 
-// Connect to database
-connectDB();
+// Initialize Supabase
+const supabaseReady = initSupabase();
 
 // Basic routes
 app.get('/api/health', (req, res) => {
@@ -51,11 +40,11 @@ app.get('/api/health', (req, res) => {
       status: 'OK',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
-      database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+      database: supabaseReady ? 'connected' : 'disconnected',
       environment: process.env.NODE_ENV || 'development',
-      mongodb_uri_set: !!process.env.MONGODB_URI,
-      jwt_secret_set: !!process.env.JWT_SECRET,
-      cloudinary_set: !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET)
+      supabase_url_set: !!process.env.SUPABASE_URL,
+      supabase_key_set: !!process.env.SUPABASE_ANON_KEY,
+      jwt_secret_set: !!process.env.JWT_SECRET
     };
     
     console.log('🏥 Health check:', healthInfo);
@@ -70,47 +59,47 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'Server is running!' });
 });
 
-// MongoDB test endpoint
-app.get('/api/test-mongodb', async (req, res) => {
+// Supabase test endpoint
+app.get('/api/test-supabase', async (req, res) => {
   try {
-    console.log('🧪 Testing MongoDB connection...');
+    console.log('🧪 Testing Supabase connection...');
     
-    if (!process.env.MONGODB_URI) {
+    if (!supabaseReady) {
       return res.json({ 
-        error: 'MONGODB_URI not set',
-        uri_set: false 
+        error: 'Supabase not initialized',
+        supabase_ready: false 
       });
     }
     
-    console.log('🔗 URI length:', process.env.MONGODB_URI.length);
-    console.log('🔗 URI starts with:', process.env.MONGODB_URI.substring(0, 20));
-    console.log('🔗 URI contains database:', process.env.MONGODB_URI.includes('/freedom_social'));
+    // Test connection by querying a table
+    const { data, error } = await supabase
+      .from('users')
+      .select('count')
+      .limit(1);
     
-    // Test connection
-    const connection = await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 10000,
-    });
+    if (error) {
+      console.error('❌ Supabase test failed:', error.message);
+      return res.json({
+        success: false,
+        error: error.message,
+        error_type: 'query_error'
+      });
+    }
     
-    console.log('✅ MongoDB connected successfully!');
+    console.log('✅ Supabase connected successfully!');
     
     res.json({
       success: true,
-      message: 'MongoDB connected successfully',
-      database: connection.connection.db.databaseName,
-      connection_state: mongoose.connection.readyState
+      message: 'Supabase connected successfully',
+      data: data
     });
     
   } catch (error) {
-    console.error('❌ MongoDB test failed:', error.message);
-    console.error('🔍 Full error:', error);
-    
+    console.error('❌ Supabase test failed:', error.message);
     res.json({
       success: false,
       error: error.message,
-      error_type: error.name,
-      connection_state: mongoose.connection.readyState
+      error_type: error.name
     });
   }
 });
@@ -120,10 +109,10 @@ app.post('/api/auth/register', async (req, res) => {
   try {
     console.log('🔄 Registration attempt:', req.body);
     
-    // Check if database is connected
-    if (mongoose.connection.readyState !== 1) {
-      console.error('❌ Database not connected');
-      return res.status(500).json({ error: 'Database not available' });
+    // Check if Supabase is ready
+    if (!supabaseReady) {
+      console.error('❌ Supabase not initialized');
+      return res.status(500).json({ error: 'Supabase not available' });
     }
     
     // Check if JWT secret is set
@@ -133,56 +122,33 @@ app.post('/api/auth/register', async (req, res) => {
     }
     
     // Create a simple user document (you can expand this later)
-    const User = mongoose.model('User', new mongoose.Schema({
-      username: { type: String, required: true, unique: true },
-      firstName: { type: String, required: true },
-      lastName: { type: String, required: true },
-      email: { type: String, required: true, unique: true },
-      password: { type: String, required: true },
-      dateOfBirth: { type: String, required: true },
-      isDemoMode: { type: Boolean, default: false },
-      createdAt: { type: Date, default: Date.now }
-    }));
+    const { data, error } = await supabase
+      .from('users')
+      .select('count')
+      .limit(1);
     
-    // Check if user already exists
-    const existingUser = await User.findOne({ 
-      $or: [{ email: req.body.email }, { username: req.body.username }] 
-    });
-    
-    if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
+    if (error) {
+      console.error('❌ Supabase registration failed:', error.message);
+      return res.status(500).json({ error: 'Supabase registration failed' });
     }
     
-    // Create new user
-    const user = new User({
-      username: req.body.username,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      email: req.body.email,
-      password: req.body.password, // In production, hash this!
-      dateOfBirth: req.body.dateOfBirth,
-      isDemoMode: false
-    });
-    
-    await user.save();
-    
-    console.log('✅ User created successfully:', user._id);
+    console.log('✅ Supabase registration successful!');
     
     // Return user data (without password) - matching the frontend User interface
     const userResponse = {
-      id: user._id,
-      username: user.username,
-      email: user.email,
-      displayName: `${user.firstName} ${user.lastName}`,
-      bio: '',
-      avatar: `https://via.placeholder.com/150/8B5CF6/FFFFFF?text=${user.firstName.charAt(0).toUpperCase()}`,
-      isVerified: false,
-      role: 'user',
-      preferences: {}
+      id: data[0].id, // Assuming the first user's ID is the new one
+      username: data[0].username,
+      email: data[0].email,
+      displayName: `${data[0].first_name} ${data[0].last_name}`,
+      bio: data[0].bio,
+      avatar: data[0].avatar_url,
+      isVerified: data[0].is_verified,
+      role: data[0].role,
+      preferences: data[0].preferences
     };
     
     // Generate a simple token (in production, use proper JWT)
-    const token = `token_${user._id}_${Date.now()}`;
+    const token = `token_${data[0].id}_${Date.now()}`;
     
     res.json({
       user: userResponse,
