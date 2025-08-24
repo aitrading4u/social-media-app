@@ -100,6 +100,16 @@ const Login: React.FC = () => {
     });
   };
 
+  const handleGoogleLogin = () => {
+    console.log('🔄 Google login clicked');
+    showError('Google login not implemented yet. Please use email/password or Demo Mode.');
+  };
+
+  const handleFacebookLogin = () => {
+    console.log('🔄 Facebook login clicked');
+    showError('Facebook login not implemented yet. Please use email/password or Demo Mode.');
+  };
+
   return (
     <Container maxWidth="sm">
       <Box sx={{ 
@@ -220,7 +230,6 @@ const Login: React.FC = () => {
               fullWidth
               variant="contained"
               size="large"
-              disabled
               sx={{ 
                 py: 1.5,
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -229,7 +238,7 @@ const Login: React.FC = () => {
                 }
               }}
             >
-              Sign In (Backend Required)
+              Sign In
             </Button>
           </Box>
 
@@ -246,8 +255,8 @@ const Login: React.FC = () => {
               variant="outlined"
               size="large"
               startIcon={<Google />}
+              onClick={handleGoogleLogin}
               sx={{ mb: 2, py: 1.5 }}
-              disabled
             >
               Continue with Google
             </Button>
@@ -256,8 +265,8 @@ const Login: React.FC = () => {
               variant="outlined"
               size="large"
               startIcon={<Facebook />}
+              onClick={handleFacebookLogin}
               sx={{ py: 1.5 }}
-              disabled
             >
               Continue with Facebook
             </Button>
