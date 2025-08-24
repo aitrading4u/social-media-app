@@ -33,15 +33,58 @@ const Login: React.FC = () => {
     email: '',
     password: ''
   });
-  const { enableDemoMode, isDemoMode } = useAuthStore();
+  const { enableDemoMode, isDemoMode, login } = useAuthStore();
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt:', formData);
-    // TODO: Implement actual login logic
-    showError('Login functionality not implemented yet. Use Demo Mode to explore the app.');
+    
+    try {
+      console.log('🔄 Login attempt:', formData);
+      
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: formData.email, // Can be username or email
+          email: formData.email,    // Can be username or email
+          password: formData.password
+        }),
+      });
+
+      console.log('📡 Login response status:', response.status);
+
+      const data = await response.json();
+      console.log('📡 Login response data:', data);
+
+      if (!response.ok) {
+        console.error('❌ Login failed:', data.error);
+        throw new Error(data.error || 'Login failed');
+      }
+
+      console.log('✅ Login successful, logging in user...');
+      
+      // Login the user
+      login(data.user, data.accessToken);
+      
+      console.log('✅ User logged in, redirecting to home...');
+      
+      showSuccess('Login successful! Welcome back.');
+      
+      // Redirect to home page
+      navigate('/');
+      
+    } catch (err: any) {
+      console.error('❌ Login error:', err);
+      if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+        showError('Unable to connect to server. Please check your internet connection and try again.');
+      } else {
+        showError(err.message || 'Login failed. Please try again.');
+      }
+    }
   };
 
   const handleDemoMode = () => {
