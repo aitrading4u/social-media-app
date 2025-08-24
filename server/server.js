@@ -70,6 +70,51 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'Server is running!' });
 });
 
+// MongoDB test endpoint
+app.get('/api/test-mongodb', async (req, res) => {
+  try {
+    console.log('🧪 Testing MongoDB connection...');
+    
+    if (!process.env.MONGODB_URI) {
+      return res.json({ 
+        error: 'MONGODB_URI not set',
+        uri_set: false 
+      });
+    }
+    
+    console.log('🔗 URI length:', process.env.MONGODB_URI.length);
+    console.log('🔗 URI starts with:', process.env.MONGODB_URI.substring(0, 20));
+    console.log('🔗 URI contains database:', process.env.MONGODB_URI.includes('/freedom_social'));
+    
+    // Test connection
+    const connection = await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 10000,
+    });
+    
+    console.log('✅ MongoDB connected successfully!');
+    
+    res.json({
+      success: true,
+      message: 'MongoDB connected successfully',
+      database: connection.connection.db.databaseName,
+      connection_state: mongoose.connection.readyState
+    });
+    
+  } catch (error) {
+    console.error('❌ MongoDB test failed:', error.message);
+    console.error('🔍 Full error:', error);
+    
+    res.json({
+      success: false,
+      error: error.message,
+      error_type: error.name,
+      connection_state: mongoose.connection.readyState
+    });
+  }
+});
+
 // Real registration endpoint
 app.post('/api/auth/register', async (req, res) => {
   try {
