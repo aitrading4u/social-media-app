@@ -170,6 +170,70 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
+// Login endpoint
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    console.log('🔄 Login attempt:', { username: req.body.username, email: req.body.email });
+    
+    // Check if Supabase is ready
+    if (!supabaseReady) {
+      console.error('❌ Supabase not initialized');
+      return res.status(500).json({ error: 'Supabase not available' });
+    }
+    
+    // Find user by username or email
+    const { data: users, error: findError } = await supabase
+      .from('users')
+      .select('*')
+      .or(`username.eq.${req.body.username || req.body.email},email.eq.${req.body.email || req.body.username}`)
+      .limit(1);
+    
+    if (findError) {
+      console.error('❌ Error finding user:', findError);
+      return res.status(500).json({ error: 'Database error: ' + findError.message });
+    }
+    
+    if (!users || users.length === 0) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+    
+    const user = users[0];
+    
+    // Check password (in production, hash and compare properly)
+    if (user.password !== req.body.password) {
+      return res.status(401).json({ error: 'Invalid password' });
+    }
+    
+    console.log('✅ User authenticated successfully:', user.id);
+    
+    // Return user data (without password) - matching the frontend User interface
+    const userResponse = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      displayName: `${user.first_name} ${user.last_name}`,
+      bio: user.bio || '',
+      avatar: user.avatar_url || `https://via.placeholder.com/150/8B5CF6/FFFFFF?text=${user.first_name.charAt(0).toUpperCase()}`,
+      isVerified: user.is_verified || false,
+      role: user.role || 'user',
+      preferences: user.preferences || {}
+    };
+    
+    // Generate a simple token (in production, use proper JWT)
+    const token = `token_${user.id}_${Date.now()}`;
+    
+    res.json({
+      user: userResponse,
+      accessToken: token,
+      message: 'Login successful'
+    });
+    
+  } catch (error) {
+    console.error('❌ Login error:', error);
+    res.status(500).json({ error: 'Login failed: ' + error.message });
+  }
+});
+
 // 404 handler
 app.use('*', (req, res) => {
   console.log('404 - Route not found:', req.originalUrl);
