@@ -1,0 +1,14 @@
+column_name,data_type,is_nullable,default_value,is_primary_key,is_unique
+id,uuid,false,gen_random_uuid(),true,false
+username,text,false,,false,true
+email,text,false,,false,true
+first_name,text,false,,false,false
+last_name,text,false,,false,false
+password,text,false,,false,false
+date_of_birth,text,false,,false,false
+bio,text,true,,false,false
+avatar_url,text,true,,false,false
+is_verified,boolean,false,false,false,false
+role,text,false,user,false,false
+preferences,jsonb,true,,false,false
+created_at,timestamp with time zone,false,now(),false,false

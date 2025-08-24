@@ -121,34 +121,62 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(500).json({ error: 'Server configuration error' });
     }
     
-    // Create a simple user document (you can expand this later)
-    const { data, error } = await supabase
+    // Check if user already exists
+    const { data: existingUsers, error: checkError } = await supabase
       .from('users')
-      .select('count')
+      .select('id')
+      .or(`email.eq.${req.body.email},username.eq.${req.body.username}`)
       .limit(1);
     
-    if (error) {
-      console.error('❌ Supabase registration failed:', error.message);
-      return res.status(500).json({ error: 'Supabase registration failed' });
+    if (checkError) {
+      console.error('❌ Error checking existing user:', checkError);
+      return res.status(500).json({ error: 'Database error' });
     }
     
-    console.log('✅ Supabase registration successful!');
+    if (existingUsers && existingUsers.length > 0) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+    
+    // Create new user
+    const { data: newUser, error: insertError } = await supabase
+      .from('users')
+      .insert([{
+        username: req.body.username,
+        email: req.body.email,
+        first_name: req.body.firstName,
+        last_name: req.body.lastName,
+        password: req.body.password, // In production, hash this!
+        date_of_birth: req.body.dateOfBirth,
+        bio: '',
+        avatar_url: `https://via.placeholder.com/150/8B5CF6/FFFFFF?text=${req.body.firstName.charAt(0).toUpperCase()}`,
+        is_verified: false,
+        role: 'user',
+        preferences: {}
+      }])
+      .select();
+    
+    if (insertError) {
+      console.error('❌ Error creating user:', insertError);
+      return res.status(500).json({ error: 'Failed to create user' });
+    }
+    
+    console.log('✅ User created successfully:', newUser[0].id);
     
     // Return user data (without password) - matching the frontend User interface
     const userResponse = {
-      id: data[0].id, // Assuming the first user's ID is the new one
-      username: data[0].username,
-      email: data[0].email,
-      displayName: `${data[0].first_name} ${data[0].last_name}`,
-      bio: data[0].bio,
-      avatar: data[0].avatar_url,
-      isVerified: data[0].is_verified,
-      role: data[0].role,
-      preferences: data[0].preferences
+      id: newUser[0].id,
+      username: newUser[0].username,
+      email: newUser[0].email,
+      displayName: `${newUser[0].first_name} ${newUser[0].last_name}`,
+      bio: newUser[0].bio || '',
+      avatar: newUser[0].avatar_url || `https://via.placeholder.com/150/8B5CF6/FFFFFF?text=${newUser[0].first_name.charAt(0).toUpperCase()}`,
+      isVerified: newUser[0].is_verified || false,
+      role: newUser[0].role || 'user',
+      preferences: newUser[0].preferences || {}
     };
     
     // Generate a simple token (in production, use proper JWT)
-    const token = `token_${data[0].id}_${Date.now()}`;
+    const token = `token_${newUser[0].id}_${Date.now()}`;
     
     res.json({
       user: userResponse,
