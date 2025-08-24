@@ -113,14 +113,17 @@ app.post('/api/auth/register', async (req, res) => {
     
     console.log('✅ User created successfully:', user._id);
     
-    // Return user data (without password)
+    // Return user data (without password) - matching the frontend User interface
     const userResponse = {
       id: user._id,
       username: user.username,
-      firstName: user.firstName,
-      lastName: user.lastName,
       email: user.email,
-      isDemoMode: false
+      displayName: `${user.firstName} ${user.lastName}`,
+      bio: '',
+      avatar: `https://via.placeholder.com/150/8B5CF6/FFFFFF?text=${user.firstName.charAt(0).toUpperCase()}`,
+      isVerified: false,
+      role: 'user',
+      preferences: {}
     };
     
     // Generate a simple token (in production, use proper JWT)
