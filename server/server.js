@@ -3,6 +3,8 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
+console.log('🚀 Server starting - VERSION 2.1 - Registration endpoint fixed');
+
 const app = express();
 
 // Basic middleware
