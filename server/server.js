@@ -21,7 +21,10 @@ const connectDB = async () => {
     }
     
     console.log('🔄 Attempting to connect to MongoDB...');
-    console.log('🔗 URI format check:', process.env.MONGODB_URI.substring(0, 20) + '...');
+    console.log('🔗 URI format check:', process.env.MONGODB_URI.substring(0, 30) + '...');
+    console.log('🔗 Full URI length:', process.env.MONGODB_URI.length);
+    console.log('🔗 URI contains database name:', process.env.MONGODB_URI.includes('/freedom_social'));
+    console.log('🔗 URI contains retryWrites:', process.env.MONGODB_URI.includes('retryWrites=true'));
     
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
