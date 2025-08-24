@@ -20,13 +20,20 @@ const connectDB = async () => {
       return;
     }
     
+    console.log('🔄 Attempting to connect to MongoDB...');
+    console.log('🔗 URI format check:', process.env.MONGODB_URI.substring(0, 20) + '...');
+    
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000, // 5 second timeout
+      socketTimeoutMS: 45000, // 45 second timeout
     });
-    console.log('✅ MongoDB connected');
+    console.log('✅ MongoDB connected successfully');
+    console.log('📊 Database name:', mongoose.connection.db.databaseName);
   } catch (err) {
     console.error('❌ MongoDB connection failed:', err.message);
+    console.error('🔍 Error details:', err);
     console.log('⚠️  Server will run without database');
   }
 };
