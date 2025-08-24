@@ -19,10 +19,13 @@ const AuthDebugger: React.FC = () => {
     const realUser = {
       id: 'real-user-123',
       username: 'testuser',
-      firstName: 'Test',
-      lastName: 'User',
       email: 'test@example.com',
-      isDemoMode: false
+      displayName: 'Test User',
+      bio: 'Test user for debugging',
+      avatar: 'https://via.placeholder.com/150/8B5CF6/FFFFFF?text=T',
+      isVerified: false,
+      role: 'user',
+      preferences: {}
     };
     
     console.log('🧪 Setting real user:', realUser);
