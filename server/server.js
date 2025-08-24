@@ -3,7 +3,7 @@ const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
-console.log('🚀 Server starting - VERSION 3.0 - Using Supabase');
+console.log('🚀 Server starting - VERSION 3.1 - Simplified registration endpoint');
 
 const app = express();
 
