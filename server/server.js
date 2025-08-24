@@ -115,29 +115,9 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(500).json({ error: 'Supabase not available' });
     }
     
-    // Check if JWT secret is set
-    if (!process.env.JWT_SECRET) {
-      console.error('❌ JWT_SECRET not set');
-      return res.status(500).json({ error: 'Server configuration error' });
-    }
+    console.log('✅ Supabase is ready, attempting to create user...');
     
-    // Check if user already exists
-    const { data: existingUsers, error: checkError } = await supabase
-      .from('users')
-      .select('id')
-      .or(`email.eq.${req.body.email},username.eq.${req.body.username}`)
-      .limit(1);
-    
-    if (checkError) {
-      console.error('❌ Error checking existing user:', checkError);
-      return res.status(500).json({ error: 'Database error' });
-    }
-    
-    if (existingUsers && existingUsers.length > 0) {
-      return res.status(400).json({ error: 'User already exists' });
-    }
-    
-    // Create new user
+    // Create new user directly (simplified)
     const { data: newUser, error: insertError } = await supabase
       .from('users')
       .insert([{
@@ -145,7 +125,7 @@ app.post('/api/auth/register', async (req, res) => {
         email: req.body.email,
         first_name: req.body.firstName,
         last_name: req.body.lastName,
-        password: req.body.password, // In production, hash this!
+        password: req.body.password,
         date_of_birth: req.body.dateOfBirth,
         bio: '',
         avatar_url: `https://via.placeholder.com/150/8B5CF6/FFFFFF?text=${req.body.firstName.charAt(0).toUpperCase()}`,
@@ -157,7 +137,7 @@ app.post('/api/auth/register', async (req, res) => {
     
     if (insertError) {
       console.error('❌ Error creating user:', insertError);
-      return res.status(500).json({ error: 'Failed to create user' });
+      return res.status(500).json({ error: 'Database error: ' + insertError.message });
     }
     
     console.log('✅ User created successfully:', newUser[0].id);
