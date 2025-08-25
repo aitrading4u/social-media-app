@@ -4,7 +4,7 @@ const { createClient } = require('@supabase/supabase-js');
 const { OAuth2Client } = require('google-auth-library');
 require('dotenv').config();
 
-console.log('🚀 Server starting - VERSION 3.2 - FORCE DEPLOY - Registration endpoint fixed');
+console.log('🚀 Server starting - VERSION 3.3 - FORCE DEPLOY - Login and Google OAuth endpoints added');
 
 const app = express();
 
@@ -174,6 +174,8 @@ app.post('/api/auth/register', async (req, res) => {
 // Login endpoint
 app.post('/api/auth/login', async (req, res) => {
   try {
+    console.log('🔄 Login endpoint called');
+    console.log('📝 Request body:', req.body);
     console.log('🔄 Login attempt:', { username: req.body.username, email: req.body.email });
     
     // Check if Supabase is ready
