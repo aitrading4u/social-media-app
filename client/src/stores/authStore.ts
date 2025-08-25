@@ -65,9 +65,13 @@ export const useAuthStore = create<AuthState>((set) => ({
   isLoading: false,
   isDemoMode: getLocalStorageItem('demoMode') === 'true',
   login: (userData, token) => {
+    console.log('🔐 AuthStore: Login called with userData:', userData);
+    console.log('🔐 AuthStore: Token:', token);
     setLocalStorageItem('token', token);
     removeLocalStorageItem('demoMode'); // Remove demo mode when logging in with real user
+    console.log('🔐 AuthStore: Demo mode removed from localStorage');
     set({ user: userData, token, isAuthenticated: true, isDemoMode: false });
+    console.log('🔐 AuthStore: State updated - isDemoMode: false');
   },
   logout: () => {
     removeLocalStorageItem('token');

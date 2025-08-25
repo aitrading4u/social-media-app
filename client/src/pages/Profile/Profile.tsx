@@ -84,7 +84,14 @@ const Profile: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { username } = useParams<{ username: string }>();
-  const { isDemoMode } = useAuthStore();
+  const { isDemoMode, user: authUser } = useAuthStore();
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('👤 Profile: isDemoMode:', isDemoMode);
+    console.log('👤 Profile: authUser:', authUser);
+    console.log('👤 Profile: username from URL:', username);
+  }, [isDemoMode, authUser, username]);
 
   // Load demo posts from localStorage
   useEffect(() => {
