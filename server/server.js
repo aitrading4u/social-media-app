@@ -45,7 +45,9 @@ app.get('/api/health', (req, res) => {
       environment: process.env.NODE_ENV || 'development',
       supabase_url_set: !!process.env.SUPABASE_URL,
       supabase_key_set: !!process.env.SUPABASE_ANON_KEY,
-      jwt_secret_set: !!process.env.JWT_SECRET
+      jwt_secret_set: !!process.env.JWT_SECRET,
+      google_client_id_set: !!process.env.GOOGLE_CLIENT_ID,
+      google_client_secret_set: !!process.env.GOOGLE_CLIENT_SECRET
     };
     
     console.log('🏥 Health check:', healthInfo);
