@@ -211,7 +211,7 @@ const Login: React.FC = () => {
               fullWidth
               label="Email or Username"
               name="email"
-              type="email"
+              type="text"
               value={formData.email}
               onChange={handleChange}
               margin="normal"

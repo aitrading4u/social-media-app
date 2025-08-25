@@ -45,13 +45,16 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuthStore();
+  const { user, isDemoMode, isAuthenticated } = useAuthStore();
 
   // Debug logging
   console.log('MainLayout v2.0 - isMobile:', isMobile);
   console.log('MainLayout v2.0 - current path:', location.pathname);
   console.log('MainLayout v2.0 - window width:', window.innerWidth);
   console.log('MainLayout v2.0 - theme breakpoints:', theme.breakpoints.down('md'));
+  console.log('MainLayout v2.0 - user:', user);
+  console.log('MainLayout v2.0 - isDemoMode:', isDemoMode);
+  console.log('MainLayout v2.0 - isAuthenticated:', isAuthenticated);
 
   // State for token balance panel
   const [showTokenBalance, setShowTokenBalance] = useState(false);
