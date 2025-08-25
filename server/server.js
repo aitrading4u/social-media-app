@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
+const { OAuth2Client } = require('google-auth-library');
 require('dotenv').config();
 
 console.log('🚀 Server starting - VERSION 3.2 - FORCE DEPLOY - Registration endpoint fixed');
@@ -231,6 +232,108 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (error) {
     console.error('❌ Login error:', error);
     res.status(500).json({ error: 'Login failed: ' + error.message });
+  }
+});
+
+// Google OAuth endpoint
+app.post('/api/auth/google', async (req, res) => {
+  try {
+    console.log('🔄 Google OAuth attempt');
+    
+    const { credential } = req.body;
+    
+    if (!credential) {
+      return res.status(400).json({ error: 'Google credential is required' });
+    }
+    
+    // Verify the Google token
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+    
+    const payload = ticket.getPayload();
+    console.log('✅ Google token verified:', { email: payload.email, name: payload.name });
+    
+    // Check if user exists in our database
+    if (!supabaseReady) {
+      console.error('❌ Supabase not initialized');
+      return res.status(500).json({ error: 'Database not available' });
+    }
+    
+    const { data: existingUsers, error: findError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', payload.email)
+      .limit(1);
+    
+    if (findError) {
+      console.error('❌ Error finding user:', findError);
+      return res.status(500).json({ error: 'Database error: ' + findError.message });
+    }
+    
+    let user;
+    
+    if (existingUsers && existingUsers.length > 0) {
+      // User exists, return their data
+      user = existingUsers[0];
+      console.log('✅ Existing user found:', user.id);
+    } else {
+      // Create new user from Google data
+      console.log('🆕 Creating new user from Google data');
+      
+      const { data: newUser, error: insertError } = await supabase
+        .from('users')
+        .insert([{
+          username: payload.email.split('@')[0] + '_' + Date.now(),
+          email: payload.email,
+          first_name: payload.given_name || 'Google',
+          last_name: payload.family_name || 'User',
+          password: 'google_oauth_' + Date.now(), // Placeholder password
+          avatar_url: payload.picture,
+          is_verified: true,
+          role: 'user',
+          bio: '',
+          preferences: {}
+        }])
+        .select();
+      
+      if (insertError) {
+        console.error('❌ Error creating user:', insertError);
+        return res.status(500).json({ error: 'Failed to create user: ' + insertError.message });
+      }
+      
+      user = newUser[0];
+      console.log('✅ New user created:', user.id);
+    }
+    
+    // Return user data matching the frontend User interface
+    const userResponse = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      displayName: `${user.first_name} ${user.last_name}`,
+      bio: user.bio || '',
+      avatar: user.avatar_url || payload.picture,
+      isVerified: user.is_verified || true,
+      role: user.role || 'user',
+      preferences: user.preferences || {}
+    };
+    
+    // Generate a simple token (in production, use proper JWT)
+    const token = `token_${user.id}_${Date.now()}`;
+    
+    res.json({
+      user: userResponse,
+      accessToken: token,
+      message: 'Google login successful'
+    });
+    
+  } catch (error) {
+    console.error('❌ Google OAuth error:', error);
+    res.status(500).json({ error: 'Google login failed: ' + error.message });
   }
 });
 

@@ -22,6 +22,7 @@ import {
   Facebook,
   PlayArrow
 } from '@mui/icons-material';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuthStore } from '../../stores/authStore';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../components/Common/ToastProvider';
@@ -100,14 +101,47 @@ const Login: React.FC = () => {
     });
   };
 
-  const handleGoogleLogin = () => {
-    console.log('🔄 Google login clicked');
-    showError('Google login not implemented yet. Please use email/password or Demo Mode.');
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      console.log('🔄 Google login success:', credentialResponse);
+      
+      // Send the credential to our backend
+      const response = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          credential: credentialResponse.credential
+        }),
+      });
+
+      const data = await response.json();
+      console.log('📡 Google login response:', data);
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Google login failed');
+      }
+
+      // Login the user
+      login(data.user, data.accessToken);
+      showSuccess('Google login successful! Welcome.');
+      navigate('/');
+      
+    } catch (err: any) {
+      console.error('❌ Google login error:', err);
+      showError(err.message || 'Google login failed. Please try again.');
+    }
+  };
+
+  const handleGoogleError = () => {
+    console.error('❌ Google login error');
+    showError('Google login failed. Please try again.');
   };
 
   const handleFacebookLogin = () => {
     console.log('🔄 Facebook login clicked');
-    showError('Facebook login not implemented yet. Please use email/password or Demo Mode.');
+    showError('Facebook login not implemented yet. Please use Google login or email/password.');
   };
 
   return (
@@ -250,16 +284,18 @@ const Login: React.FC = () => {
 
           {/* Social Login */}
           <Box sx={{ mb: 3 }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              size="large"
-              startIcon={<Google />}
-              onClick={handleGoogleLogin}
-              sx={{ mb: 2, py: 1.5 }}
-            >
-              Continue with Google
-            </Button>
+            <Box sx={{ mb: 2 }}>
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                useOneTap
+                theme="outline"
+                size="large"
+                text="continue_with"
+                shape="rectangular"
+                width="100%"
+              />
+            </Box>
             <Button
               fullWidth
               variant="outlined"

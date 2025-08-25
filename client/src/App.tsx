@@ -2,6 +2,7 @@
 // DEPLOYMENT TRIGGER: Latest commit d748f19 with all build fixes
 // VERCEL DEPLOYMENT FIX: This should trigger a new build with updated config
 import React, { useEffect, useState } from 'react';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -185,33 +186,35 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <ToastProvider>
-          <Router>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-              <Route path="/profile/:username" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-              <Route path="/post/:id" element={<ProtectedRoute><PostDetail /></ProtectedRoute>} />
-              <Route path="/explore" element={<ProtectedRoute><Explore /></ProtectedRoute>} />
-              <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
-              <Route path="/live" element={<ProtectedRoute><LiveStreamingPage /></ProtectedRoute>} />
-              <Route path="/analytics" element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
-              <Route path="/ai-recommendations" element={<ProtectedRoute><AIRecommendationsPage /></ProtectedRoute>} />
-              <Route path="/marketplace" element={<ProtectedRoute><MarketplacePage /></ProtectedRoute>} />
-              <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-              <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-            </Routes>
-            
-            {/* PWA Components */}
-            <ServiceWorkerRegistration />
-            <InstallPrompt />
-          </Router>
-        </ToastProvider>
-      </ThemeProvider>
+      <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <ToastProvider>
+            <Router>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                <Route path="/profile/:username" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path="/post/:id" element={<ProtectedRoute><PostDetail /></ProtectedRoute>} />
+                <Route path="/explore" element={<ProtectedRoute><Explore /></ProtectedRoute>} />
+                <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+                <Route path="/live" element={<ProtectedRoute><LiveStreamingPage /></ProtectedRoute>} />
+                <Route path="/analytics" element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
+                <Route path="/ai-recommendations" element={<ProtectedRoute><AIRecommendationsPage /></ProtectedRoute>} />
+                <Route path="/marketplace" element={<ProtectedRoute><MarketplacePage /></ProtectedRoute>} />
+                <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+                <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+              </Routes>
+              
+              {/* PWA Components */}
+              <ServiceWorkerRegistration />
+              <InstallPrompt />
+            </Router>
+          </ToastProvider>
+        </ThemeProvider>
+      </GoogleOAuthProvider>
     </ErrorBoundary>
   );
 }
