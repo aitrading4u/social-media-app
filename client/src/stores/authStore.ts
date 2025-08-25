@@ -63,7 +63,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   token: getLocalStorageItem('token'),
   isAuthenticated: !!getLocalStorageItem('token'),
   isLoading: false,
-  isDemoMode: getLocalStorageItem('demoMode') === 'true',
+  isDemoMode: false, // Temporarily disabled demo mode
   login: (userData, token) => {
     console.log('🔐 AuthStore: Login called with userData:', userData);
     console.log('🔐 AuthStore: Token:', token);

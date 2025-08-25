@@ -183,13 +183,14 @@ const Login: React.FC = () => {
             </Typography>
           </Alert>
 
-          {/* Demo Mode Button */}
+          {/* Demo Mode Button - Temporarily Disabled */}
           <Button
             fullWidth
             variant="contained"
             size="large"
             startIcon={<PlayArrow />}
             onClick={handleDemoMode}
+            disabled
             sx={{ 
               mb: 3,
               py: 1.5,
@@ -199,7 +200,7 @@ const Login: React.FC = () => {
               }
             }}
           >
-            Try Demo Mode
+            Demo Mode Disabled
           </Button>
 
           <Divider sx={{ my: 3 }}>
