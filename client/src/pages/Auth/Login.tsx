@@ -95,6 +95,9 @@ const Login: React.FC = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Remove any validation errors by clearing the field's validity
+    e.target.setCustomValidity('');
+    
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -216,6 +219,10 @@ const Login: React.FC = () => {
               onChange={handleChange}
               margin="normal"
               required
+              inputProps={{
+                pattern: ".*",
+                title: "Enter your email or username"
+              }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
